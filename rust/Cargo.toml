@@ -2,7 +2,12 @@
 name = "adventofcode-2023"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+
+[[bin]]
+name = "es1"
+path = "src/bin/es1/es.rs"
+
+[[bin]]
+name = "es2"
+path = "src/bin/es2/es.rs"
