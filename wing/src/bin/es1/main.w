@@ -36,16 +36,16 @@ let calculateCalibration = inflight (line: str): num => {
         .replace("nine", "nine9nine");
 
     let var firstNumber: num? = nil;
-    for index in 0..line.length {
-        if let res = findNumber(line, index) {
+    for index in 0..line2.length {
+        if let res = findNumber(line2, index) {
             firstNumber = res;
             break;
         }
     }
 
     let var secondNumber: num? = nil;
-    for index in line.length - 1..0 {
-        if let res = findNumber(line, index) {
+    for index in line2.length - 1..0 {
+        if let res = findNumber(line2, index) {
             secondNumber = res;
             break;
         }
