@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("in2.txt");
+    let input = include_str!("in.txt");
 
     let res:u32 = input
         .split("\n")
