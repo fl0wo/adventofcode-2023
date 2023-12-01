@@ -11,7 +11,6 @@ fn main(){
                 .replace("five","five5five")
                 .replace("six","six6six")
                 .replace("seven","seven7seven")
-
                 .replace("two","two2two")
                 .replace("four","four4four")
                 .replace("eight","eight8eight")
