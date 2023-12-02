@@ -40,7 +40,6 @@ static CUBES: Map<&'static str, u32> = phf_map! {
 
 fn main() {
     let input = include_str!("in.txt");
-
     let res = input
         .split("\n")
         .map(|line| {
@@ -72,24 +71,20 @@ fn main() {
 }
 
 fn solve(game_id:u32, games: Vec<String>) -> u32 {
-
     for game in games {
         for col in COLORS {
             if game.contains(col) {
-
                 let max = CUBES.index(col);
                 let val = game
                     .replace(col,"")
                     .trim()
                     .parse::<u32>()
                     .unwrap();
-
                 if val > *max {
                     return 0;
                 }
             }
         }
     }
-
     return game_id;
 }
