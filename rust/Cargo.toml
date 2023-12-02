@@ -16,3 +16,7 @@ path = "src/bin/es1_pt2/es.rs"
 [[bin]]
 name = "es2"
 path = "src/bin/es2/es.rs"
+
+[[bin]]
+name = "es2_pt2"
+path = "src/bin/es2_pt2/es.rs"
