@@ -20,17 +20,9 @@ The power of a set of cubes is equal to the numbers of red, green, and blue cube
 
 For each game, find the minimum set of cubes that must have been present. What is the sum of the power of these sets?
 **/
-
-use std::ops::Index;
-use ::phf::{phf_map, Map};
 use std::collections::HashMap;
 
 const COLORS: [&str; 3] = ["red", "green", "blue"];
-static CUBES: Map<&'static str, u32> = phf_map! {
-    "red" => 12,
-    "green" => 13,
-    "blue" => 14,
-};
 
 fn main() {
     let input = include_str!("in.txt");
@@ -41,12 +33,6 @@ fn main() {
             let index = line.find(":").unwrap();
             let line_split = line.split_at(index);
 
-            let game_id = line_split
-                .0
-                .replace("Game ","")
-                .parse::<u32>()
-                .unwrap();
-
             let games = line_split
                 .1
                 .replace(": ","")
@@ -55,7 +41,6 @@ fn main() {
                 .collect::<Vec<String>>();
 
             return solve(
-                game_id,
                 games
             );
         })
@@ -64,18 +49,17 @@ fn main() {
     println!("{}", res);
 }
 
-fn solve(game_id:u32, games: Vec<String>) -> u32 {
+fn solve(games: Vec<String>) -> u32 {
 
     let mut map = HashMap::from([
         ("red", 0),
         ("green", 0),
-        ("blue", 1),
+        ("blue", 0),
     ]);
 
     for game in games {
         for col in COLORS {
             if game.contains(col) {
-                let max = CUBES.index(col);
                 let val = game
                     .replace(col,"")
                     .trim()
