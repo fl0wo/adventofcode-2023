@@ -10,9 +10,9 @@ name = "es1"
 path = "src/bin/es1/es.rs"
 
 [[bin]]
-name = "es2"
-path = "src/bin/es2/es.rs"
+name = "es1_pt2"
+path = "src/bin/es1_pt2/es.rs"
 
 [[bin]]
-name = "es3"
-path = "src/bin/es3/es.rs"
+name = "es2"
+path = "src/bin/es2/es.rs"
