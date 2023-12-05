@@ -37,3 +37,7 @@ path = "src/bin/es4/es.rs"
 [[bin]]
 name = "es4_pt2"
 path = "src/bin/es4_pt2/es.rs"
+
+[[bin]]
+name = "es5"
+path = "src/bin/es5/es.rs"

@@ -81,7 +81,7 @@ fn solve_recursive(wins: &Vec<usize>, pos: usize) -> usize {
 
     let mut res = 1;
     for i in 0..wins[pos] {
-        res += solve_recursive(wins, pos + i+1);
+        res += solve_recursive(wins, pos+i+1);
     }
 
     return res;
