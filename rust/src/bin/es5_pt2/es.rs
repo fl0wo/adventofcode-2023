@@ -1,139 +1,162 @@
-/**
---- Part Two ---
-Everyone will starve if you only plant such a small number of seeds. Re-reading the almanac, it looks like the seeds: line actually describes ranges of seed numbers.
+use itertools::Itertools;
 
-The values on the initial seeds: line come in pairs. Within each pair, the first value is the start of the range and the second value is the length of the range. So, in the first line of the example above:
-
-seeds: 79 14 55 13
-This line describes two ranges of seed numbers to be planted in the garden. The first range starts with seed number 79 and contains 14 values: 79, 80, ..., 91, 92. The second range starts with seed number 55 and contains 13 values: 55, 56, ..., 66, 67.
-
-Now, rather than considering four seed numbers, you need to consider a total of 27 seed numbers.
-
-In the above example, the lowest location number can be obtained from seed number 82, which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45, humidity 46, and location 46. So, the lowest location number is 46.
-
-Consider all of the initial seed numbers listed in the ranges on the first line of the almanac. What is the lowest location number that corresponds to any of the initial seed numbers?
- **/
-
-// 2 elements DP array
-
-use memoize::memoize;
-
-static mut MAPS: Vec<Vec<Vec<u64>>> = Vec::new();
-
-fn get_map_at_index(index: usize, pos: usize) -> &'static Vec<u64> {
-    unsafe {
-        return &MAPS[index][pos];
-    }
+struct Rule {
+    destination: i64,
+    source: i64,
+    range: i64,
 }
 
-fn get_map_at_index_1(index: usize) -> &'static Vec<Vec<u64>> {
-    unsafe {
-        return &MAPS[index];
-    }
+#[derive(Debug, Clone)]
+struct Range {
+    from: i64,
+    to: i64,
 }
 
-fn get_maps_len() -> usize {
-    unsafe {
-        return MAPS.len();
+pub fn part_1(input: &str) -> i64 {
+    let (seeds_str, maps_str) = input.split_once("\n\n").unwrap();
+    let seeds = seeds_str.strip_prefix("seeds: ").unwrap();
+    let seeds = seeds.split_whitespace().map(|s| s.parse::<i64>().unwrap());
+
+    let maps: Vec<Vec<Rule>> = maps_str
+        .split("\n\n")
+        .map(|block| {
+            block
+                .lines()
+                .skip(1)
+                .map(|line| {
+                    let mut nums = line.splitn(3, " ");
+                    Rule {
+                        destination: nums.next().unwrap().parse().unwrap(),
+                        source: nums.next().unwrap().parse().unwrap(),
+                        range: nums.next().unwrap().parse().unwrap(),
+                    }
+                })
+                .collect()
+        })
+        .collect();
+
+    seeds
+        .map(|seed| {
+            maps.iter().fold(seed, |curr, rules| {
+                if let Some(rule) = rules
+                    .iter()
+                    .find(|rule| curr >= rule.source && curr <= rule.source + rule.range)
+                {
+                    let offset = curr - rule.source;
+                    rule.destination + offset
+                } else {
+                    curr
+                }
+            })
+        })
+        .min()
+        .unwrap()
+}
+
+pub fn part_2(input: &str) -> i64 {
+    let (seeds_str, maps_str) = input.split_once("\n\n").unwrap();
+    let seeds = seeds_str.strip_prefix("seeds: ").unwrap();
+    let seeds = seeds
+        .split_whitespace()
+        .map(|s| s.parse::<i64>().unwrap())
+        .chunks(2);
+    let seeds = seeds.into_iter().map(|mut chunk| {
+        let from = chunk.next().unwrap();
+        let range = chunk.next().unwrap();
+        Range {
+            from,
+            to: from + range,
+        }
+    });
+
+    let maps: Vec<Vec<Rule>> = maps_str
+        .split("\n\n")
+        .map(|block| {
+            block
+                .lines()
+                .skip(1)
+                .map(|line| {
+                    let mut nums = line.splitn(3, " ");
+                    Rule {
+                        destination: nums.next().unwrap().parse().unwrap(),
+                        source: nums.next().unwrap().parse().unwrap(),
+                        range: nums.next().unwrap().parse().unwrap(),
+                    }
+                })
+                .sorted_by(|a, b| a.source.cmp(&b.source))
+                .collect()
+        })
+        .collect();
+
+    // for every range in the seed ranges, transform it to a range of the next kind, repeat until all all maps are applied, at that point all ranges are location ranges
+    // loop1 transforms those ranges of seed to ranges of soils
+    // loop2 transforms those ranges of soil to ranges of fertilizer
+    // loop3 transforms those ranges of fertilizer to ranges of water
+    // loop4 transforms those ranges of water to ranges of light
+    // loop5 transforms those ranges of light to ranges of temperature
+    // loop6 transforms those ranges of temperature to ranges of humidity
+    // loop7 transforms those ranges of humidity to ranges of location
+    let mut curr_ranges: Vec<Range> = seeds.collect();
+
+    for map in &maps {
+        let mut new_ranges: Vec<Range> = Vec::new();
+
+        for range in &curr_ranges {
+            let mut curr = range.clone();
+
+            for rule in map {
+                let offset = rule.destination - rule.source;
+                let rule_applies = curr.from <= curr.to
+                    && curr.from <= rule.source + rule.range
+                    && curr.to >= rule.source;
+
+                if rule_applies {
+                    if curr.from < rule.source {
+                        new_ranges.push(Range {
+                            from: curr.from,
+                            to: rule.source - 1,
+                        });
+                        curr.from = rule.source;
+                        if curr.to < rule.source + rule.range {
+                            new_ranges.push(Range {
+                                from: curr.from + offset,
+                                to: curr.to + offset,
+                            });
+                            curr.from = curr.to + 1;
+                        } else {
+                            new_ranges.push(Range {
+                                from: curr.from + offset,
+                                to: rule.source + rule.range - 1 + offset,
+                            });
+                            curr.from = rule.source + rule.range;
+                        }
+                    } else if curr.to < rule.source + rule.range {
+                        new_ranges.push(Range {
+                            from: curr.from + offset,
+                            to: curr.to + offset,
+                        });
+                        curr.from = curr.to + 1;
+                    } else {
+                        new_ranges.push(Range {
+                            from: curr.from + offset,
+                            to: rule.source + rule.range - 1 + offset,
+                        });
+                        curr.from = rule.source + rule.range;
+                    }
+                }
+            }
+            if curr.from <= curr.to {
+                new_ranges.push(curr);
+            }
+        }
+        curr_ranges = new_ranges;
     }
+
+    curr_ranges.iter().map(|range| range.from).min().unwrap()
 }
 
 fn main() {
-    let lines = include_str!("in");
-
-    let blocks = lines
-        .split("\n\n")
-        .map(|line| {
-            return line.split_at(line.find(":").unwrap())
-                .1
-                .split("\n");
-        })
-        .map(|lines| {
-            return lines
-                .map(|line| {
-                    return line
-                        .replace(":", "")
-                        .split(" ")
-                        .filter(|n| !n.is_empty() && !n.contains(":") && !n.contains("\n"))
-                        .map(|n| {
-                            // fix `Err` value: ParseIntError { kind: PosOverflow }
-                            return n.trim().parse::<u64>().unwrap();
-                        })
-                        .collect::<Vec<u64>>();
-                });
-        });
-
-    for block in blocks {
-        let mut map: Vec<Vec<u64>> = Vec::new();
-        for line in block {
-            if line.len() == 0 {
-                continue;
-            }
-            let mut v: Vec<u64> = Vec::new();
-            for n in line {
-                v.push(n);
-            }
-            map.push(v);
-        }
-        unsafe {
-            MAPS.push(map);
-        }
-    }
-
-    // println!("{:?}", maps);
-
-    let seeds = get_map_at_index(0, 0).clone();
-    // lets do it recursively
-
-    let res = seeds
-        .chunks(2)
-        .map(|chunk| {
-            let start = chunk[0];
-            let len = chunk[1];
-            return (start..start+len).collect::<Vec<u64>>();
-        })
-        .flat_map(|seed| {
-            return seed.iter().map(|s| {
-                return *s;
-            }).collect::<Vec<u64>>();
-        })
-        .map(|seed| {
-            return solve_recursive(seed, 1);
-        })
-        .min()
-        .unwrap();
-
-    println!("{:?}", res);
-}
-
-#[memoize]
-fn solve_recursive(seed: u64, pos: usize) -> u64 {
-    if pos >= get_maps_len() {
-        return seed;
-    }
-
-    let mut res: Vec<u64> = Vec::new();
-
-    let maps = get_map_at_index_1(pos);
-
-    for map in maps {
-        let dest = map[0];
-        let src = map[1];
-        let len = map[2];
-        if seed >= src && seed < src + len {
-            res.push(dest + (seed - src));
-        }
-    }
-
-    // If no rules apply, the number is unchanged.
-    if res.len() == 0 {
-        res.push(seed);
-    }
-
-    let mut res2: Vec<u64> = Vec::new();
-    for r in res {
-        res2.push(solve_recursive(r, pos+1));
-    }
-
-    return *res2.iter().min().unwrap();
+    let input = include_str!("in");
+    println!("{}", part_1(input));
+    println!("{}", part_2(input));
 }

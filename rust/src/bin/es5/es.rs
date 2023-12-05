@@ -156,6 +156,8 @@ fn solve_recursive(seed: &u64, maps: &Vec<Vec<Vec<u64>>>, pos: usize) -> u64 {
         return *seed;
     }
 
+    // sort
+
     let mut res: Vec<u64> = Vec::new();
     for map in &maps[pos] {
         let dest = map[0];

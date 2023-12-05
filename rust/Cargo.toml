@@ -6,6 +6,13 @@ edition = "2021"
 phf = { version = "0.11.2", features = ["macros"] }
 array-init = "2.1.0"
 memoize = "0.4.1"
+rayon = "1.7.0"
+iter_tools = "0.1.4"
+regex = "1.9.5"
+lazy_static = "1.4.0"
+anyhow = { version = "1.0.75", features = [] }
+num = { version = "0.4.1", features = [] }
+itertools = "0.10.5"
 
 [[bin]]
 name = "es1"
