@@ -114,7 +114,6 @@ fn main() {
                         .split(" ")
                         .filter(|n| !n.is_empty() && !n.contains(":") && !n.contains("\n"))
                         .map(|n| {
-                            println!("parsing {}", n);
                             // fix `Err` value: ParseIntError { kind: PosOverflow }
                             return n.trim().parse::<u64>().unwrap();
                         })
@@ -130,7 +129,6 @@ fn main() {
             if line.len() == 0 {
                 continue;
             }
-
             let mut v: Vec<u64> = Vec::new();
             for n in line {
                 v.push(n);
@@ -143,65 +141,65 @@ fn main() {
     // println!("{:?}", maps);
 
     let seeds = maps[0][0].clone();
-    let seed_to_soil = maps[1].clone();
-    let soil_to_fertilizer = maps[2].clone();
-    let fertilizer_to_water = maps[3].clone();
-    let water_to_light = maps[4].clone();
-    let light_to_temperature = maps[5].clone();
-    let temperature_to_humidity = maps[6].clone();
-    let humidity_to_location = maps[7].clone();
+    // let seed_to_soil = maps[1].clone();
+    // let soil_to_fertilizer = maps[2].clone();
+    // let fertilizer_to_water = maps[3].clone();
+    // let water_to_light = maps[4].clone();
+    // let light_to_temperature = maps[5].clone();
+    // let temperature_to_humidity = maps[6].clone();
+    // let humidity_to_location = maps[7].clone();
 
-    // println!("{:?}", seeds);
-    // println!("{:?}", seed_to_soil);
-    // println!("{:?}", soil_to_fertilizer);
-    // println!("{:?}", fertilizer_to_water);
-    // println!("{:?}", water_to_light);
-    // println!("{:?}", light_to_temperature);
-    // println!("{:?}", temperature_to_humidity);
-    // println!("{:?}", humidity_to_location);
+    // let res = seeds
+    //     .iter().map(|seed| {
+    //     let to_soil = apply_mapping(seed, &seed_to_soil)[0];
+    //     let to_fertilizer = apply_mapping(&to_soil, &soil_to_fertilizer)[0];
+    //     let to_water = apply_mapping(&to_fertilizer, &fertilizer_to_water)[0];
+    //     let to_light = apply_mapping(&to_water, &water_to_light)[0];
+    //     let to_temperature = apply_mapping(&to_light, &light_to_temperature)[0];
+    //     let to_humidity = apply_mapping(&to_temperature, &temperature_to_humidity)[0];
+    //     let to_location = apply_mapping(&to_humidity, &humidity_to_location)[0];
+    //     return to_location;
+    // })
+    //     .min()
+    //     .unwrap();
 
+    // lets do it recursively
 
     let res = seeds
-        .iter().map(|seed| {
-        let to_soil = apply_mapping(seed, &seed_to_soil);
-        let to_fertilizer = apply_mapping(&to_soil, &soil_to_fertilizer);
-        let to_water = apply_mapping(&to_fertilizer, &fertilizer_to_water);
-        let to_light = apply_mapping(&to_water, &water_to_light);
-        let to_temperature = apply_mapping(&to_light, &light_to_temperature);
-        let to_humidity = apply_mapping(&to_temperature, &temperature_to_humidity);
-        let to_location = apply_mapping(&to_humidity, &humidity_to_location);
-        return to_location;
-    })
+        .iter()
+        .map(|seed| {
+            return solve_recursive(seed, &maps, 1);
+        })
         .min()
         .unwrap();
 
     println!("{:?}", res);
 }
 
-fn apply_mapping(seed: &u64, mapping: &Vec<Vec<u64>>) -> u64 {
-    let mut res = seed.clone();
-    let prev_res = 10000000;
-    for map in mapping {
+fn solve_recursive(seed: &u64, maps: &Vec<Vec<Vec<u64>>>, pos: usize) -> u64 {
+    if pos >= maps.len() {
+        return *seed;
+    }
+
+    let mut res: Vec<u64> = Vec::new();
+    for map in &maps[pos] {
         let dest = map[0];
         let src = map[1];
         let len = map[2];
         if *seed >= src && *seed < src + len {
-            let new_seed = dest + (*seed - src);
-
-            let new_distance = abs_dif(new_seed,*seed);
-            let prev_distance = abs_dif(prev_res,*seed);
-            if(new_distance < prev_distance) {
-                res = new_seed;
-            }
-            break;
+            res.push(dest + (*seed - src));
         }
     }
-    return res;
-}
 
-fn abs_dif(n: u64,n1:u64) -> u64 {
-    if n > n1 {
-        return n - n1;
+    // If no rules apply, the number is unchanged.
+    if res.len() == 0 {
+        res.push(*seed);
     }
-    return n1 - n;
+
+    let mut res2: Vec<u64> = Vec::new();
+    for r in res {
+        res2.push(solve_recursive(&r, maps, pos+1));
+    }
+
+    return *res2.iter().min().unwrap();
 }
