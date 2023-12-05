@@ -138,32 +138,7 @@ fn main() {
         maps.push(map);
     }
 
-    // println!("{:?}", maps);
-
     let seeds = maps[0][0].clone();
-    // let seed_to_soil = maps[1].clone();
-    // let soil_to_fertilizer = maps[2].clone();
-    // let fertilizer_to_water = maps[3].clone();
-    // let water_to_light = maps[4].clone();
-    // let light_to_temperature = maps[5].clone();
-    // let temperature_to_humidity = maps[6].clone();
-    // let humidity_to_location = maps[7].clone();
-
-    // let res = seeds
-    //     .iter().map(|seed| {
-    //     let to_soil = apply_mapping(seed, &seed_to_soil)[0];
-    //     let to_fertilizer = apply_mapping(&to_soil, &soil_to_fertilizer)[0];
-    //     let to_water = apply_mapping(&to_fertilizer, &fertilizer_to_water)[0];
-    //     let to_light = apply_mapping(&to_water, &water_to_light)[0];
-    //     let to_temperature = apply_mapping(&to_light, &light_to_temperature)[0];
-    //     let to_humidity = apply_mapping(&to_temperature, &temperature_to_humidity)[0];
-    //     let to_location = apply_mapping(&to_humidity, &humidity_to_location)[0];
-    //     return to_location;
-    // })
-    //     .min()
-    //     .unwrap();
-
-    // lets do it recursively
 
     let res = seeds
         .iter()

@@ -5,6 +5,7 @@ edition = "2021"
 [dependencies]
 phf = { version = "0.11.2", features = ["macros"] }
 array-init = "2.1.0"
+memoize = "0.4.1"
 
 [[bin]]
 name = "es1"
@@ -41,3 +42,7 @@ path = "src/bin/es4_pt2/es.rs"
 [[bin]]
 name = "es5"
 path = "src/bin/es5/es.rs"
+
+[[bin]]
+name = "es5_pt2"
+path = "src/bin/es5_pt2/es.rs"
