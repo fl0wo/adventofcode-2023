@@ -53,3 +53,7 @@ path = "src/bin/es5/es.rs"
 [[bin]]
 name = "es5_pt2"
 path = "src/bin/es5_pt2/es.rs"
+
+[[bin]]
+name = "es6"
+path = "src/bin/es6/es.rs"
